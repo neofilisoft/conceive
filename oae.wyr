@@ -1,0 +1,281 @@
+var seed = 1
+
+fn rand() {
+    seed = (seed * 1103515245 + 12345) % 2147483648
+    if seed < 0 { seed = 0 - seed }
+    return seed
+}
+
+fn rand_range(lo, hi) {
+    return lo + (rand() % (hi - lo + 1))
+}
+
+fn rand_unit() {
+    return (rand() % 10000) / 10000.0
+}
+
+fn mock_hash(n) {
+    var h = (n * 2654435761) % 4294967296
+    if h < 0 { h = 0 - h }
+    return h
+}
+
+fn init_rng_from_jitter() {
+    var s = 1
+    var i = 0
+    do {
+        s = (s * 1664525 + 1013904223) % 2147483648
+        if s < 0 { s = 0 - s }
+        i = i + 1
+    } til i >= 40000
+
+    var j = 0
+    var limit2 = 15000 + (s % 30000)
+    do {
+        s = (s * 1103515245 + 12345) % 2147483648
+        if s < 0 { s = 0 - s }
+        j = j + 1
+    } til j >= limit2
+
+    var k = 0
+    do {
+        s = (s * 214013 + 2531011) % 2147483648
+        if s < 0 { s = 0 - s }
+        k = k + 1
+    } til k >= 5000
+
+    seed = s
+    if seed < 1 { seed = 1 }
+
+    var w = 0
+    do {
+        rand()
+        w = w + 1
+    } til w >= 7
+
+    print("RNG seeded from pure-jitter: " + str(seed))
+}
+
+fn fmt3(x) {
+    var n = int(x * 1000.0 + 0.5)
+    var whole = n / 1000
+    var frac = n % 1000
+    if frac < 0 { frac = 0 - frac }
+    var frac_s = str(frac)
+    if frac < 10 {
+        frac_s = "00" + frac_s
+    } elif frac < 100 {
+        frac_s = "0" + frac_s
+    }
+    return str(whole) + "." + frac_s
+}
+
+fn pick_archetype() {
+    var t = rand_range(1, 5)
+    if t == 1 { return "Analytic-Guardian" }
+    if t == 2 { return "Stoic-Strategist" }
+    if t == 3 { return "Curious-Explorer" }
+    if t == 4 { return "Empathic-Mediator" }
+    return "Genesis-Hybrid"
+}
+
+fn pick_persona() {
+    var t = rand_range(1, 4)
+    if t == 1 { return "Stoic-Analytic" }
+    if t == 2 { return "Balanced-Strategist" }
+    if t == 3 { return "Adaptive-Learner" }
+    return "Resilient-Core"
+}
+
+fn pick_region() {
+    var t = rand_range(1, 4)
+    if t == 1 { return "TH" }
+    if t == 2 { return "SEA" }
+    if t == 3 { return "GLOBAL" }
+    return "LAB"
+}
+
+fn emit_identity() {
+    var trust = 0.40 + rand_unit() * 0.50
+    var alignment = 0.50 + rand_unit() * 0.45
+    var curiosity = 0.30 + rand_unit() * 0.60
+    var discipline = 0.30 + rand_unit() * 0.60
+    var empathy = 0.20 + rand_unit() * 0.60
+    var volatility = 0.10 + rand_unit() * 0.40
+    var confidence = 0.40 + rand_unit() * 0.50
+    var learn_rate = 0.03 + rand_unit() * 0.12
+    var potential = 1 + (rand() % 100)
+
+    var logic = 0.35 + (potential / 200.0)
+    if logic > 1.0 { logic = 1.0 }
+    var adapt = 0.30 + (potential / 250.0)
+    if adapt > 1.0 { adapt = 1.0 }
+    var stability = 1.0 - ((50 - potential) / 100.0)
+    if stability < 0.0 { stability = 0.0 - stability }
+    if stability < 0.1 { stability = 0.1 }
+    if stability > 1.0 { stability = 1.0 }
+
+    var did = "did:world:0x" + str(mock_hash(seed + rand()))
+    var token_id = "soken_" + str(mock_hash(int(trust * 10000) + 777 + (seed % 1000000)))
+    var soul_sig = str(mock_hash(int(trust * 1000) + potential + seed))
+    var prov_hash = str(mock_hash(potential + seed + 99))
+    var owner = "AetherLab:Node-" + str(1 + (rand() % 99))
+    var archetype = pick_archetype()
+    var persona = pick_persona()
+    var region = pick_region()
+    var generation = 1 + (rand() % 12)
+    var mutation = 0.005 + rand_unit() * 0.03
+    var base_seed = str(mock_hash(seed))
+
+    var arm_str = 10.0 + rand_unit() * 15.0
+    var arm_fat = rand_unit() * 5.0
+    var legs_str = 10.0 + rand_unit() * 12.0
+    var legs_fat = rand_unit() * 4.0
+    var mem_str = 20.0 + rand_unit() * 30.0
+
+    // ---- JSON ----
+    print("========== DIGITAL IDENTITY (JSON) ==========")
+    print("{")
+    print("  \"schema\": \"soken_identity_v1\",")
+    print("  \"token_id\": \"" + token_id + "\",")
+    print("  \"soul_signature\": \"" + soul_sig + "\",")
+    print("  \"provenance_hash\": \"" + prov_hash + "\",")
+    print("  \"non_fungible\": true,")
+    print("  \"unique_identity\": true,")
+    print("  \"transferable\": false,")
+    print("  \"merge_policy\": \"soul-consensus-v1\",")
+    print("  \"identity\": {")
+    print("    \"did\": \"" + did + "\",")
+    print("    \"owner\": \"" + owner + "\",")
+    print("    \"trust_score\": " + fmt3(trust) + ",")
+    print("    \"consent_level\": 1.000,")
+    print("    \"region\": \"" + region + "\"")
+    print("  },")
+    print("  \"ddna\": {")
+    print("    \"archetype\": \"" + archetype + "\",")
+    print("    \"generation\": " + str(generation) + ",")
+    print("    \"mutation_rate\": " + fmt3(mutation) + ",")
+    print("    \"base_seed\": \"" + base_seed + "\",")
+    print("    \"traits\": {")
+    print("      \"logic\": " + fmt3(logic) + ",")
+    print("      \"empathy\": " + fmt3(empathy) + ",")
+    print("      \"curiosity\": " + fmt3(curiosity) + ",")
+    print("      \"discipline\": " + fmt3(discipline))
+    print("    }")
+    print("  },")
+    print("  \"cognition\": {")
+    print("    \"persona\": \"" + persona + "\",")
+    print("    \"alignment\": " + fmt3(alignment) + ",")
+    print("    \"curiosity\": " + fmt3(curiosity) + ",")
+    print("    \"discipline\": " + fmt3(discipline) + ",")
+    print("    \"empathy\": " + fmt3(empathy) + ",")
+    print("    \"volatility\": " + fmt3(volatility) + ",")
+    print("    \"confidence\": " + fmt3(confidence) + ",")
+    print("    \"learning_rate\": " + fmt3(learn_rate) + ",")
+    print("    \"affect_level\": 0.000")
+    print("  },")
+    print("  \"digital_organs\": {")
+    print("    \"arm_right\": {")
+    print("      \"schema\": \"motor_v2_power\",")
+    print("      \"volatile\": true,")
+    print("      \"strength\": " + fmt3(arm_str) + ",")
+    print("      \"fatigue\": " + fmt3(arm_fat) + ",")
+    print("      \"integrity\": 100.000")
+    print("    },")
+    print("    \"legs\": {")
+    print("      \"schema\": \"motor_v2_endurance\",")
+    print("      \"volatile\": false,")
+    print("      \"strength\": " + fmt3(legs_str) + ",")
+    print("      \"fatigue\": " + fmt3(legs_fat) + ",")
+    print("      \"integrity\": 100.000")
+    print("    },")
+    print("    \"memory_core\": {")
+    print("      \"schema\": \"cognitive_v1_memory\",")
+    print("      \"volatile\": false,")
+    print("      \"strength\": " + fmt3(mem_str) + ",")
+    print("      \"fatigue\": 0.000,")
+    print("      \"integrity\": 100.000")
+    print("    }")
+    print("  },")
+    print("  \"meta\": {")
+    print("    \"potential\": " + str(potential) + ",")
+    print("    \"rng_seed\": " + str(seed) + ",")
+    print("    \"generated_by\": \"oae.wyr\"")
+    print("  }")
+    print("}")
+    print("=============================================")
+
+    // ---- YAML ----
+    print("")
+    print("========== DIGITAL IDENTITY (YAML) ==========")
+    print("schema: soken_identity_v1")
+    print("token_id: " + token_id)
+    print("soul_signature: " + soul_sig)
+    print("provenance_hash: " + prov_hash)
+    print("non_fungible: true")
+    print("unique_identity: true")
+    print("transferable: false")
+    print("merge_policy: soul-consensus-v1")
+    print("identity:")
+    print("  did: " + did)
+    print("  owner: " + owner)
+    print("  trust_score: " + fmt3(trust))
+    print("  consent_level: 1.000")
+    print("  region: " + region)
+    print("ddna:")
+    print("  archetype: " + archetype)
+    print("  generation: " + str(generation))
+    print("  mutation_rate: " + fmt3(mutation))
+    print("  base_seed: " + base_seed)
+    print("  traits:")
+    print("    logic: " + fmt3(logic))
+    print("    empathy: " + fmt3(empathy))
+    print("    curiosity: " + fmt3(curiosity))
+    print("    discipline: " + fmt3(discipline))
+    print("cognition:")
+    print("  persona: " + persona)
+    print("  alignment: " + fmt3(alignment))
+    print("  curiosity: " + fmt3(curiosity))
+    print("  discipline: " + fmt3(discipline))
+    print("  empathy: " + fmt3(empathy))
+    print("  volatility: " + fmt3(volatility))
+    print("  confidence: " + fmt3(confidence))
+    print("  learning_rate: " + fmt3(learn_rate))
+    print("  affect_level: 0.000")
+    print("digital_organs:")
+    print("  arm_right:")
+    print("    schema: motor_v2_power")
+    print("    volatile: true")
+    print("    strength: " + fmt3(arm_str))
+    print("    fatigue: " + fmt3(arm_fat))
+    print("    integrity: 100.000")
+    print("  legs:")
+    print("    schema: motor_v2_endurance")
+    print("    volatile: false")
+    print("    strength: " + fmt3(legs_str))
+    print("    fatigue: " + fmt3(legs_fat))
+    print("    integrity: 100.000")
+    print("  memory_core:")
+    print("    schema: cognitive_v1_memory")
+    print("    volatile: false")
+    print("    strength: " + fmt3(mem_str))
+    print("    fatigue: 0.000")
+    print("    integrity: 100.000")
+    print("meta:")
+    print("  potential: " + str(potential))
+    print("  rng_seed: " + str(seed))
+    print("  generated_by: oae.wyr")
+    print("=============================================")
+}
+
+fn main() {
+    init_rng_from_jitter()
+
+    print("--- OAE / Soken Digital Identity Generator (Wyrm) ---")
+    print("")
+
+    emit_identity()
+
+    print("")
+    print("Done. Copy JSON or YAML block above into your pipeline.")
+}
