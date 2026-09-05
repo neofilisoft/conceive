@@ -1,4 +1,4 @@
-# Soken Digital Identity & Breeding Simulation (Wyrm)
+# Soken Digital Identity & Breeding Simulation 
 
 An experimental simulation engine written in the Wyrm programming language (`.wyr`) for generative digital identities, cross-species breeding mechanics, and non-transferable cognitive profiles.
 
