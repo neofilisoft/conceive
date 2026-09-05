@@ -90,7 +90,7 @@ Both scripts implement a self-contained Linear Congruential Generator (LCG) seed
   * พารามิเตอร์ด้านจิตวิทยา: ความสอดคล้อง (Alignment), ความผันผวน (Volatility), ความมั่นใจ (Confidence), อัตราการเรียนรู้ (Learning Rate), และระดับอารมณ์กระทบ (Affect Level)[cite: 2] 
 * **อวัยวะดิจิทัล (Digital Organs)**: 
   * แขนขวา (`arm_right`): สกีมา `motor_v2_power` (ผันแปรได้)[cite: 2] 
-  * ขา (`legs`): สกีมา `motor_v2_endurance` (คงที่)[cite: 2] 
+  * ขา (`legs`): schema `motor_v2_endurance` (คงที่)[cite: 2] 
   * แกนบันทึกความจำ (`memory_core`): สกีมา `cognitive_v1_memory` (คงที่)[cite: 2] 
 
 #### 3. ระบบสุ่มแบบ Deterministic Jitter RNG ทั้งสองสคริปต์ทำงานผ่านอัลกอริทึม Linear Congruential Generator (LCG) ในตัว โดยตั้งค่า Seed ผ่านรอบหมุนคำนวณ Jitter หลายขั้นตอน (`init_rng_from_jitter`) เพื่อสร้างตัวเลขสุ่มเทียมที่พกพาไปทำงานได้ทุกระบบโดยไม่ต้องพึ่งพาระบบเวลาของระบบปฏิบัติการ[cite: 1, 2] 
