@@ -78,18 +78,23 @@ Both scripts implement a self-contained Linear Congruential Generator (LCG) seed
 #### 2. `oae.wyr` (ระบบสร้างอัตลักษณ์ดิจิทัล Soken) 
 ทำหน้าที่สร้างข้อมูลอัตลักษณ์สังเคราะห์ระดับเต็มรูปแบบตามข้อกำหนดมาตรฐาน `soken_identity_v1`:[cite: 2] 
 * **ข้อมูลตัวตนและที่มา (Identity and Provenance)**: 
- * สถาปัตยกรรม Soulbound: ไม่สามารถสับเปลี่ยนได้ มีเอกลักษณ์เฉพาะตัว ไม่สามารถโอนย้ายได้ และผูกกับนโยบาย `soul-consensus-v1`[cite: 2] 
- * กำหนดรหัส Decentralized Identifier ในรูปแบบ `did:world:0x...` พร้อมระบุโหนดเจ้าของ (`AetherLab:Node-*`)[cite: 2] 
- * รองรับการกำหนดภูมิภาค ได้แก่ `TH`, `SEA`, `GLOBAL`, และ `LAB`[cite: 2] 
+  * สถาปัตยกรรม Soulbound: ไม่สามารถสับเปลี่ยนได้ มีเอกลักษณ์เฉพาะตัว ไม่สามารถโอนย้ายได้ และผูกกับนโยบาย `soul-consensus-v1`[cite: 2] 
+  * กำหนดรหัส Decentralized Identifier ในรูปแบบ `did:world:0x...` พร้อมระบุโหนดเจ้าของ (`AetherLab:Node-*`)[cite: 2] 
+  * รองรับการกำหนดภูมิภาค ได้แก่ `TH`, `SEA`, `GLOBAL`, และ `LAB`[cite: 2] 
 * **รหัสพันธุกรรมดิจิทัล (DDNA)**: 
- * สถาปัตยกรรมบุคลิก (Archetypes): Analytic-Guardian, Stoic-Strategist, Curious-Explorer, Empathic-Mediator, Genesis-Hybrid[cite: 2] 
- * ติดตามลำดับรุ่น (Generation 1 ถึง 12) พร้อมอัตราการกลายพันธุ์แบบสุ่ม[cite: 2]  
- * คุณลักษณะแกนกลาง: ตรรกะ (Logic), ความเข้าอกเข้าใจ (Empathy), ความอยากรู้อยากเห็น (Curiosity), และวินัย (Discipline)[cite: 2] 
+  * สถาปัตยกรรมบุคลิก (Archetypes): Analytic-Guardian, Stoic-Strategist, Curious-Explorer, Empathic-Mediator, Genesis-Hybrid[cite: 2] 
+  * ติดตามลำดับรุ่น (Generation 1 ถึง 12) พร้อมอัตราการกลายพันธุ์แบบสุ่ม[cite: 2]  
+  * คุณลักษณะแกนกลาง: ตรรกะ (Logic), ความเข้าอกเข้าใจ (Empathy), ความอยากรู้อยากเห็น (Curiosity), และวินัย (Discipline)[cite: 2] 
 * **ระบบการรู้คิดและการทำงานของจิต (Cognitive Profile)**: 
- * ลักษณะบุคลิก (Personas): Stoic-Analytic, Balanced-Strategist, Adaptive-Learner, Resilient-Core[cite: 2]
- * * พารามิเตอร์ด้านจิตวิทยา: ความสอดคล้อง (Alignment), ความผันผวน (Volatility), ความมั่นใจ (Confidence), อัตราการเรียนรู้ (Learning Rate), และระดับอารมณ์กระทบ (Affect Level)[cite: 2] * **อวัยวะดิจิทัล (Digital Organs)**: * แขนขวา (`arm_right`): สกีมา `motor_v2_power` (ผันแปรได้)[cite: 2] * ขา (`legs`): สกีมา `motor_v2_endurance` (คงที่)[cite: 2] * แกนบันทึกความจำ (`memory_core`): สกีมา `cognitive_v1_memory` (คงที่)[cite: 2] 
+  * ลักษณะบุคลิก (Personas): Stoic-Analytic, Balanced-Strategist, Adaptive-Learner, Resilient-Core[cite: 2]
+  * พารามิเตอร์ด้านจิตวิทยา: ความสอดคล้อง (Alignment), ความผันผวน (Volatility), ความมั่นใจ (Confidence), อัตราการเรียนรู้ (Learning Rate), และระดับอารมณ์กระทบ (Affect Level)[cite: 2] 
+* **อวัยวะดิจิทัล (Digital Organs)**: 
+  * แขนขวา (`arm_right`): สกีมา `motor_v2_power` (ผันแปรได้)[cite: 2] 
+  * ขา (`legs`): สกีมา `motor_v2_endurance` (คงที่)[cite: 2] 
+  * แกนบันทึกความจำ (`memory_core`): สกีมา `cognitive_v1_memory` (คงที่)[cite: 2] 
 
 #### 3. ระบบสุ่มแบบ Deterministic Jitter RNG ทั้งสองสคริปต์ทำงานผ่านอัลกอริทึม Linear Congruential Generator (LCG) ในตัว โดยตั้งค่า Seed ผ่านรอบหมุนคำนวณ Jitter หลายขั้นตอน (`init_rng_from_jitter`) เพื่อสร้างตัวเลขสุ่มเทียมที่พกพาไปทำงานได้ทุกระบบโดยไม่ต้องพึ่งพาระบบเวลาของระบบปฏิบัติการ[cite: 1, 2] 
+
 ### โครงสร้างโปรเจกต์ 
 ```text
 .
