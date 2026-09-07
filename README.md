@@ -14,7 +14,7 @@ This repository contains simulation modules written in Wyrm for generative linea
 
 ### Core Modules
 
-#### 1. `conseive.wyr` (Breeding and Lineage Engine)
+#### 1. `conceive.wyr` (Breeding and Lineage Engine)
 Simulates conception mechanics and genetic trait inheritance between different species:
 * **Breeding Odds Calculation**:
   * Human + Human: 70% to 90% success rate
@@ -61,7 +61,7 @@ Both scripts implement a self-contained Linear Congruential Generator (LCG) seed
 ## ภาษาไทย ### 
 ภาพรวมโครงการ คลังข้อมูลนี้รวบรวมโมดูลจำลองระบบตัวตนดิจิทัลและการสืบพันธุ์สายพันธุ์จำลอง พัฒนาด้วยภาษา Wyrm (`.wyr`) ส่งออกข้อมูลในรูปแบบมาตรฐานทั้ง JSON และ YAML 
 ### โมดูลหลักในระบบ 
-#### 1. `conseive.wyr` (ระบบจำลองการผสมพันธุ์และสายเลือด) 
+#### 1. `conceive.wyr` (ระบบจำลองการผสมพันธุ์และสายเลือด) 
 ทำหน้าที่คำนวณความน่าจะเป็นในการตั้งครรภ์และการส่งต่อลักษณะเฉพาะไปยังรุ่นลูก: 
 * **การคำนวณอัตราความสำเร็จตามคู่สายพันธุ์**: 
   * มนุษย์ + มนุษย์ (Human + Human): อัตราสำเร็จ 70% ถึง 90%[cite: 1] 
