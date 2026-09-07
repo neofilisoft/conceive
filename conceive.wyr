@@ -1,107 +1,53 @@
 // ============================================================
-//  conceive.wyr
+//  conceive.wyr 
 // ============================================================
 
 use std.json;
 use std.yaml;
+use std.random;
+use std.time;
 
-var seed = 1
-
-fn rand() {
-    seed = (seed * 1103515245 + 12345) % 2147483648
-    if seed < 0 { seed = 0 - seed }
-    return seed
+struct BreedingResult {
+    combination,
+    rate,
+    roll,
+    pregnant
 }
-
-fn rand_range(lo, hi) {
-    return lo + (rand() % (hi - lo + 1))
-}
-
-fn roll_100() {
-    return 1 + (rand() % 100)
-}
-
-// Pure-jitter seed (portable stand-in for random.seed(int(time.time())))
-fn init_rng_from_jitter() {
-    var s = 1
-    var i = 0
-    do {
-        s = (s * 1664525 + 1013904223) % 2147483648
-        if s < 0 { s = 0 - s }
-        i = i + 1
-    } til i >= 40000
-
-    var j = 0
-    var limit2 = 15000 + (s % 30000)
-    do {
-        s = (s * 1103515245 + 12345) % 2147483648
-        if s < 0 { s = 0 - s }
-        j = j + 1
-    } til j >= limit2
-
-    var k = 0
-    do {
-        s = (s * 214013 + 2531011) % 2147483648
-        if s < 0 { s = 0 - s }
-        k = k + 1
-    } til k >= 5000
-
-    seed = s
-    if seed < 1 { seed = 1 }
-
-    var w = 0
-    do {
-        rand()
-        w = w + 1
-    } til w >= 7
-
-    print("RNG seeded from pure-jitter: " + str(seed))
-}
-
-// ---- breeding state ----
-var last_combination = ""
-var last_rate = 0
-var last_pregnant = false
-var last_roll = 0
 
 fn calculate_pregnancy(race1, race2) {
-    last_combination = "Breeding is not supported"
-    last_rate = 0
-    last_pregnant = false
-    last_roll = 0
+    var combo = "Breeding is not supported"
+    var rate = 0
 
     if race1 == "human" and race2 == "human" {
-        last_rate = rand_range(70, 90)
-        last_combination = "human + human"
+        rate = rand_range(70, 90)
+        combo = "human + human"
     } elif race1 == "elf" and race2 == "elf" {
-        last_rate = rand_range(40, 50)
-        last_combination = "elf + elf"
+        rate = rand_range(40, 50)
+        combo = "elf + elf"
     } elif (race1 == "human" and race2 == "elf") or (race1 == "elf" and race2 == "human") {
-        last_rate = rand_range(28, 45)
-        last_combination = "human + elf"
+        rate = rand_range(28, 45)
+        combo = "human + elf"
     } else {
-        return
+        return BreedingResult(combo, 0, 0, false)
     }
 
-    last_roll = roll_100()
-    if last_roll <= last_rate {
-        last_pregnant = true
-    }
+    var roll = rand_range(1, 100)
+    var is_pregnant = roll <= rate
+
+    return BreedingResult(combo, rate, roll, is_pregnant)
 }
 
-fn show_result(race1, race2) {
-    calculate_pregnancy(race1, race2)
-
-    if last_combination == "Breeding is not supported" {
-        print("miss " + last_combination)
+fn show_result(res) {
+    if res.combination == "Breeding is not supported" {
+        print("miss " + res.combination)
         print("---")
         return
     }
 
-    print(" breeding: " + last_combination)
-    print(" successful rate: " + str(last_rate) + "%")
-    print(" roll result: " + str(last_roll) + "/100")
-    if last_pregnant {
+    print(" breeding: " + res.combination)
+    print(" successful rate: " + str(res.rate) + "%")
+    print(" roll result: " + str(res.roll) + "/100")
+    if res.pregnant {
         print("result: Conceive successfully")
     } else {
         print("result: Not conceive")
@@ -110,14 +56,14 @@ fn show_result(race1, race2) {
 }
 
 // สร้าง child identity แล้วพิมพ์เป็น JSON + YAML
-fn emit_child_identity(race1, race2, roll) {
-    var potential = roll + rand_range(0 - 10, 10)
+fn emit_child_identity(race1, race2, roll, last_rate) {
+    var potential = roll + rand_range(-10, 10)
     if potential < 1 { potential = 1 }
     if potential > 100 { potential = 100 }
 
-    var child_tail = 1000 + (rand() % 9000)
-    var child_id = "child-" + str(child_tail) + str(rand() % 10000)
-    var did = "did:soken:" + str(rand()) + str(rand() % 100000)
+    var child_tail = rand_range(1000, 9999)
+    var child_id = "child-" + str(child_tail) + str(rand_range(1000, 9999))
+    var did = "did:soken:" + rand_bytes_hex(8)
 
     var logic = 0.30 + (potential / 220.0)
     if logic > 1.0 { logic = 1.0 }
@@ -130,7 +76,7 @@ fn emit_child_identity(race1, race2, roll) {
 
     // ---- JSON object ----
     var root = json_object()
-    json_set(root, "event_id", "conceive-" + str(rand() % 1000000000))
+    json_set(root, "event_id", "conceive-" + str(rand_range(100000000, 999999999)))
     json_set(root, "breeding", race1 + " + " + race2)
     json_set(root, "pregnancy_rate", last_rate)
     json_set(root, "roll_result", roll)
@@ -155,7 +101,7 @@ fn emit_child_identity(race1, race2, roll) {
     json_set(traits, "stability", stability)
     json_set(child, "base_traits", traits)
 
-    json_set(child, "soul_signature", str(rand()) + str(rand()))
+    json_set(child, "soul_signature", rand_bytes_hex(16))
     json_set(root, "child_identity", child)
 
     print("")
@@ -169,7 +115,14 @@ fn emit_child_identity(race1, race2, roll) {
 }
 
 fn main() {
-    init_rng_from_jitter()
+    // Seeding RNG: prefer CPU hardware entropy (TRNG), fallback to high-resolution timestamp
+    if rand_has_trng() {
+        rand_reseed_trng()
+        print("RNG seeded via CPU Hardware TRNG (RDRAND)")
+    } else {
+        rand_seed(time_unix_ms())
+        print("RNG seeded via high-precision timestamp")
+    }
 
     print("=== RNG Intercourse System (Wyrm) ===")
     print("")
@@ -178,34 +131,32 @@ fn main() {
     var i = 1
     do {
         print("time number " + str(i) + ":")
-        var t = rand_range(1, 3)
-        if t == 1 {
-            show_result("human", "human")
-        } elif t == 2 {
-            show_result("elf", "elf")
-        } else {
-            show_result("human", "elf")
-        }
+        var pair = rand_choice([["human", "human"], ["elf", "elf"], ["human", "elf"]])
+        var r = calculate_pregnancy(pair[0], pair[1])
+        show_result(r)
         i = i + 1
     } til i > 10
 
     // trials แบบ fixed
     print("=== trials (fixed) ===")
-    show_result("human", "human")
-    var human_ok = last_pregnant
-    var human_roll = last_roll
-    show_result("elf", "elf")
-    show_result("human", "elf")
+    var r_hh = calculate_pregnancy("human", "human")
+    show_result(r_hh)
 
-    // ถ้า human+human สำเร็จ > ออก identity เป็น JSON/YAML
-    if human_ok {
+    var r_ee = calculate_pregnancy("elf", "elf")
+    show_result(r_ee)
+
+    var r_he = calculate_pregnancy("human", "elf")
+    show_result(r_he)
+
+    // ถ้า human+human สำเร็จ -> ออก identity เป็น JSON/YAML
+    if r_hh.pregnant {
         print("")
         print("One successful human+human conception detected.")
-        emit_child_identity("human", "human", human_roll)
+        emit_child_identity("human", "human", r_hh.roll, r_hh.rate)
     } else {
         print("")
         print("No successful human+human conception in fixed trials.")
-        print("(Re-run to try again — RNG changes each run)")
+        print("(Re-run to try again - RNG changes each run)")
     }
 
     print("")
